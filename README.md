@@ -1,47 +1,188 @@
-# 🚀 Blue-Green Deployment
+🚀 Blue-Green Deployment
 
-> A production-style **Blue-Green Deployment** demonstration built with **Node.js**, **Express**, **MongoDB**, **Docker Compose**, and **Nginx**. This project showcases how to deploy a new version of an application alongside the current version and seamlessly switch traffic with minimal downtime.
+  A production-style Blue-Green Deployment demonstration built with
+  Node.js, Express, MongoDB, Docker Compose, and Nginx.
 
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square\&logo=node.js\&logoColor=white)
-![Express](https://img.shields.io/badge/Express-000000?style=flat-square\&logo=express\&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square\&logo=mongodb\&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square\&logo=docker\&logoColor=white)
-![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=flat-square\&logo=docker\&logoColor=white)
-![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square\&logo=nginx\&logoColor=white)
+------------------------------------------------------------------------
 
----
+📖 Overview
 
-## 📖 Overview
+This project demonstrates a Blue-Green Deployment strategy using a
+simple Todo REST API.
 
-Blue-Green Deployment is a release strategy that minimizes application downtime by maintaining two identical environments:
+Two identical application environments run simultaneously:
 
-* **Blue** – the currently active version serving production traffic.
-* **Green** – the new version deployed alongside the Blue environment.
+-   Blue – the currently active version serving users.
+-   Green – the new version deployed alongside Blue.
 
-Instead of replacing the running application, the Green environment is deployed independently. After verifying that the new version is healthy, traffic is switched from Blue to Green through an **Nginx reverse proxy**. If any issues occur, traffic can be immediately switched back to the Blue environment.
+Traffic is routed through Nginx, allowing requests to be switched
+between Blue and Green without stopping the application. If the new
+deployment fails, traffic can immediately be switched back to the
+previous version.
 
-This project uses a simple **Todo REST API** as the sample application and demonstrates how Docker networking, Docker Compose, and Nginx work together to implement a Blue-Green deployment strategy.
+------------------------------------------------------------------------
 
----
+🏗️ Architecture
 
-## 🏗️ Architecture
+                        Client
+                           │
+                           ▼
+                  http://localhost
+                           │
+                     Nginx Proxy
+                           │
+              ┌────────────┴────────────┐
+              ▼                         ▼
+         API Blue                  API Green
+        (Version Blue)           (Version Green)
+              │                         │
+              └────────────┬────────────┘
+                           ▼
+                        MongoDB
 
-```text
-                    Client
-                       │
-                       ▼
-              http://localhost
-                       │
-                 Nginx Proxy
-                       │
-          ┌────────────┴────────────┐
-          ▼                         ▼
-     API Blue                  API Green
-    (Version Blue)           (Version Green)
-          │                         │
-          └────────────┬────────────┘
-                       ▼
-                    MongoDB
-```
+------------------------------------------------------------------------
 
-Only one API version receives traffic at a time. Switching deployments only requires updating the Nginx configuration and reloading the proxy, resulting in a near zero-downtime deployment.
+✨ Features
+
+-   Blue-Green deployment strategy
+-   Zero-downtime traffic switching
+-   Docker Compose orchestration
+-   Nginx reverse proxy
+-   Shared MongoDB database
+-   Todo REST API
+-   /version endpoint
+-   /health endpoint
+
+------------------------------------------------------------------------
+
+🛠️ Tech Stack
+
+-   Node.js
+-   Express
+-   MongoDB
+-   Mongoose
+-   Docker
+-   Docker Compose
+-   Nginx
+
+------------------------------------------------------------------------
+
+📁 Project Structure
+
+    Blue-Green-Deployment/
+    ├── .github/
+    ├── ansible/
+    ├── terraform/
+    ├── nginx/
+    │   └── default.conf
+    ├── todo-api/
+    │   ├── Dockerfile
+    │   ├── server.js
+    │   ├── package.json
+    │   ├── models/
+    │   └── routes/
+    ├── docker-compose.yml
+    └── README.md
+
+------------------------------------------------------------------------
+
+🚀 Running the Project
+
+Prerequisites
+
+-   Docker
+-   Docker Compose
+
+Start
+
+    docker compose up --build
+
+Visit:
+
+    http://localhost
+
+------------------------------------------------------------------------
+
+🔄 Blue-Green Deployment Demo
+
+By default, Nginx routes traffic to:
+
+    proxy_pass http://api-blue:3000;
+
+Check the active version:
+
+    curl http://localhost/version
+
+Example response:
+
+    {
+      "version": "Blue"
+    }
+
+To switch to Green:
+
+1.  Edit nginx/default.conf
+
+    proxy_pass http://api-green:3000;
+
+2.  Reload Nginx
+
+    docker compose exec nginx nginx -s reload
+
+3.  Verify
+
+    curl http://localhost/version
+
+Response:
+
+    {
+      "version": "Green"
+    }
+
+Rollback simply changes the proxy back to api-blue and reloads Nginx.
+
+------------------------------------------------------------------------
+
+❤️ Health Check
+
+    curl http://localhost/health
+
+Example response:
+
+    {
+      "status": "healthy",
+      "version": "Green"
+    }
+
+------------------------------------------------------------------------
+
+📚 API Endpoints
+
+  Method   Endpoint     Description
+  -------- ------------ ----------------------------
+  GET      /todos       Retrieve all todos
+  POST     /todos       Create a todo
+  GET      /todos/:id   Retrieve a todo
+  PUT      /todos/:id   Update a todo
+  DELETE   /todos/:id   Delete a todo
+  GET      /version     Current deployment version
+  GET      /health      Health status
+
+------------------------------------------------------------------------
+
+🔮 Future Improvements
+
+-   GitHub Actions CI/CD
+-   Prometheus monitoring
+-   Grafana dashboards
+-   HTTPS with Let’s Encrypt
+-   Kubernetes deployment
+
+------------------------------------------------------------------------
+
+👨‍💻 Author
+
+Built as part of the roadmap.sh Blue-Green Deployment project to
+practice container orchestration, reverse proxies, and deployment
+strategies.
+https://roadmap.sh/projects/blue-green-deployment
